@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hanoi Urban Health - Data Quality Report</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; background: #0f172a; color: #f8fafc; }
+        .card { background: #1e293b; border-radius: 12px; padding: 28px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); max-width: 800px; margin: auto; }
+        .badge { background: #10b981; color: white; padding: 6px 16px; border-radius: 9999px; font-weight: bold; }
+        h1 { color: #38bdf8; margin-top: 0; }
+        .metric { background: #334155; padding: 12px 20px; border-radius: 8px; margin: 8px 0; }
+        .highlight { color: #f59e0b; font-weight: bold; }
+        .success { color: #34d399; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Báo Cáo Làm Sạch Dữ Liệu Sức Khỏe Đô Thị (Data Docs - TV 2)</h1>
+        <p><strong>Trạng thái tiền xử lý:</strong> <span class="badge">PASSED</span></p>
+        <div class="metric"><strong>1. Số bản ghi thô ban đầu (Raw Records):</strong> <span class="highlight">10935</span></div>
+        <div class="metric"><strong>2. Bản ghi trùng lặp bị khử (Deduplicated):</strong> 15 bản ghi trùng</div>
+        <div class="metric"><strong>3. Ngoại lai / Mã lỗi sensor loại bỏ (Outliers & Hardware Errors Filtered):</strong> <span class="highlight">59</span> bản ghi (chứa PM2.5 = -999 hoặc > 500)</div>
+        <div class="metric"><strong>4. Số bản ghi sạch hoàn thiện (Curated Records):</strong> <span class="success">10861</span></div>
+        <div class="metric"><strong>5. Bụi mịn PM2.5 trung bình sau điền khuyết:</strong> 35.89 µg/m³</div>
+        <div class="metric"><strong>6. Chỉ số US AQI trung bình:</strong> 101.6</div>
+    </div>
+</body>
+</html>

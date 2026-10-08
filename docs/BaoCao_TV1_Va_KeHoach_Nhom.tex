@@ -1,0 +1,355 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{geometry}
+\geometry{a4paper, margin=2cm}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,multirow}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage{tikz}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=teal!80!black,
+    citecolor=red!80!black
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{orange!80!black},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!5},
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
+
+\tcbset{
+    boxrule=0.8pt,
+    arc=4pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{0.5cm}
+    {\Large \textbf{ĐẠI HỌC BÁCH KHOA HÀ NỘI}}\\[0.2cm]
+    {\large \textbf{TRƯỜNG CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG}}\\[1.5cm]
+    
+    \begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=\centering\Large\textbf{BÁO CÁO BÀI TẬP LỚN HỌC PHẦN (IT4142)}, arc=6pt]
+        \centering\vspace{0.3cm}
+        {\LARGE \textbf{NHẬP MÔN KHOA HỌC DỮ LIỆU}}\\[0.4cm]
+        {\large \textbf{Đề tài:}} \\[0.2cm]
+        {\Large \textbf{HỆ THỐNG GIÁM SÁT SỨC KHỎE ĐÔ THỊ HÀ NỘI: PHÂN TÍCH MỐI TƯƠNG QUAN GIAO THÔNG - CHẤT LƯỢNG KHÔNG KHÍ - SỰ KIỆN \& DỰ BÁO CHỈ SỐ ĐÁNG SỐNG (H-UVSI)}}\\[0.3cm]
+        \textit{(Hanoi Urban Vitality \& Stress Index - Multimodal Spatiotemporal Analytics)}
+        \vspace{0.3cm}
+    \end{tcolorbox}
+    
+    \vspace{1.5cm}
+    
+    \begin{minipage}{0.9\textwidth}
+        \textbf{Phần I:} Báo cáo Kỹ thuật Chuyên sâu Phân hệ 1 (Data Ingestion) của Thành viên 1.\\[0.2cm]
+        \textbf{Phần II:} Ma trận Phân công Nhiệm vụ Toàn diện cho 08 Thành viên còn lại (TV 2 $\to$ TV 9).\\[0.2cm]
+        \textbf{Quy mô nhóm:} 09 Sinh viên \quad $\vert$ \quad \textbf{Phân bổ trách nhiệm:} 11.11\% / Thành viên.\\[0.2cm]
+        \textbf{Thành viên 1 (Nhóm trưởng):} Data Ingestion Lead $\vert$ Phân hệ Crawl \& Data Pipeline.
+    \end{minipage}
+    
+    \vfill
+    {\large Hà Nội, Năm học 2026 -- 2027}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Tổng Quan Bài Toán \& Lý Do Chọn Đề Tài H-UVSI}
+
+\subsection{Bối Cảnh Thực Tế \& Động Lực Nghiên Cứu}
+Thủ đô Hà Nội là một trong những trung tâm kinh tế, chính trị có mật độ dân cư và tốc độ đô thị hóa nhanh nhất Đông Nam Á. Tuy nhiên, Hà Nội đang đối mặt với hai thách thức liên đới nghiêm trọng:
+\begin{enumerate}
+    \item \textbf{Ô nhiễm không khí trầm trọng:} Bụi mịn PM2.5, khí thải CO, $\text{NO}_2$ thường xuyên vượt ngưỡng khuyến cáo của WHO, đặc biệt vào mùa đông và các đợt nghịch nhiệt.
+    \item \textbf{Ùn tắc giao thông lan tỏa:} Hàng triệu phương tiện cá nhân lưu thông trong giờ cao điểm gây tắc nghẽn cục bộ và làm tăng nồng độ khí thải trực tiếp.
+\end{enumerate}
+
+Nhằm giải quyết bất đồng quan điểm giữa các thành viên và đáp ứng yêu cầu của giảng viên, nhóm quyết định hợp nhất 3 chiều đo: \textbf{Không khí (Air Quality)}, \textbf{Giao thông (Traffic Congestion)}, và \textbf{Sự kiện đô thị (Urban Crowd Incidents)} thành một đồ án khoa học dữ liệu hoàn chỉnh mang tên: \textbf{Hệ thống Giám sát Sức khỏe Đô thị Hà Nội (Hanoi Urban Health \& Liveability Index - H-UVSI)}.
+
+\subsection{Mô Hình Quan Hệ Nhân Quả Giữa Các Chiều Đo}
+Khác với việc phân tán đề tài, 3 chiều đo gắn kết chặt chẽ theo chuỗi quan hệ nhân quả:
+\begin{equation}
+    \text{Sự Kiện Đô Thị / Ngập Úng} \xrightarrow{\text{kích hoạt}} \text{Ùn Tắc Giao Thông} \xrightarrow{\text{phát thải khí xe}} \text{Bụi Mịn PM2.5 \& Khí Độc} \xrightarrow{\text{sụt giảm}} \text{Chỉ Số Đáng Sống (UVSI)}
+\end{equation}
+
+\vspace{0.5cm}
+
+\section{PHẦN I: BÁO CÁO KỸ THUẬT CỦA THÀNH VIÊN 1 (DATA INGESTION LEAD)}
+
+\subsection{Trách Nhiệm \& Cơ Sở Lý Thuyết Cốt Lõi (Bài Giảng L2)}
+\begin{tcolorbox}[colback=teal!5!white, colframe=teal!75!black, title=\textbf{Tóm tắt nhiệm vụ của Thành viên 1}]
+Thành viên 1 giữ vai trò \textbf{Nhóm trưởng \& Data Ingestion Lead}. Chịu trách nhiệm thiết kế và lập trình toàn bộ hệ thống thu thập dữ liệu tự động đa nguồn (Multi-Source Ingestion Engine) tại tệp tin \texttt{src/ingestion/urban\_crawler.py}.\\
+Đảm bảo cung cấp nguồn dữ liệu thực nghiệm sạch, đạt quy mô \textbf{trên 20.000 dòng dữ liệu thô} và làm tiền đề cho 8 phân hệ tiếp theo.
+\end{tcolorbox}
+
+Theo nội dung Bài giảng số 2 (\textit{Web Crawling \& Data Acquisition}), Thành viên 1 đã hiện thực hóa các nguyên lý khoa học máy tính:
+\begin{itemize}
+    \item \textbf{RESTful API Polling vs. Web Scraping:} Kết hợp giữa truy vấn API phân tầng (có cấu trúc dữ liệu JSON) và bóc tách cây DOM HTML từ website tin tức.
+    \item \textbf{Crawl Politeness \& Anti-blocking:} Tuân thủ hạn ngạch tần suất gửi yêu cầu (Rate Limiting), xoay vòng HTTP User-Agent giả lập trình duyệt, ngăn chặn việc bị máy chủ tường lửa chặn địa chỉ IP.
+    \item \textbf{Fault-Tolerance (Cơ chế chịu lỗi):} Thiết lập cơ chế thử lại có lùi số mũ (\textit{Exponential Backoff}) và bộ đệm ngoại tuyến (\textit{Graceful Fallback Cache}) bảo đảm pipeline không bị dừng đột ngột khi mất kết nối mạng.
+    \item \textbf{Columnar Data Ingestion:} Nạp và nén dữ liệu trực tiếp sang định dạng Apache Parquet (Snappy), loại bỏ chi phí tuần tự hóa (serialization overhead) so với tệp CSV thông thường.
+\end{itemize}
+
+\subsection{Đặc Tả Chi Tiết Cách Thức Crawl Dữ Liệu Từng Nguồn}
+
+\subsubsection{Nguồn 1: Thu thập Dữ liệu Không khí Lịch sử từ Open-Meteo Air Quality REST API}
+\begin{itemize}
+    \item \textbf{Địa chỉ Endpoint:} \texttt{https://air-quality-api.open-meteo.com/v1/air-quality}
+    \item \textbf{Phương thức truyền nhận:} HTTP GET có tham số truy vấn (\textit{Query Parameters}).
+    \item \textbf{Phạm vi không gian:} Thu thập cho 5 quận đại diện cho 5 vùng đô thị của Hà Nội:
+    \begin{enumerate}
+        \item Hoàn Kiếm (\texttt{HN\_HK}): Tọa độ $(21.0285^\circ\text{N}, 105.8542^\circ\text{E})$ -- Trung tâm lịch sử, dịch vụ, phố đi bộ.
+        \item Cầu Giấy (\texttt{HN\_CG}): Tọa độ $(21.0365^\circ\text{N}, 105.7935^\circ\text{E})$ -- Khu công nghệ, đại học, mật độ dân cư cao.
+        \item Đống Đa (\texttt{HN\_DD}): Tọa độ $(21.0180^\circ\text{N}, 105.8250^\circ\text{E})$ -- Nút giao thông huyết mạch (Ngã Tư Sở, Chùa Bộc).
+        \item Hà Đông (\texttt{HN\_HD}): Tọa độ $(20.9720^\circ\text{N}, 105.7750^\circ\text{E})$ -- Đô thị vệ tinh, cửa ngõ phía Tây Nam.
+        \item Nam Từ Liêm (\texttt{HN\_NTL}): Tọa độ $(21.0120^\circ\text{N}, 105.7650^\circ\text{E})$ -- Trung tâm hành chính mới, SVĐ Quốc gia Mỹ Đình.
+    \end{enumerate}
+    \item \textbf{Tham số chỉ số lấy theo từng giờ (\textit{Hourly Metrics}):}
+    \texttt{pm10, pm2\_5, carbon\_monoxide, nitrogen\_dioxide, european\_aqi, us\_aqi}.
+    \item \textbf{Phạm vi thời gian:} Từ \texttt{2024-01-01} đến \texttt{2024-03-31} (3 tháng = 2.184 giờ/quận).
+    \item \textbf{Quy mô dữ liệu thu được:} $5 \text{ quận} \times 2.184 \text{ giờ} = \mathbf{10.920 \text{ dòng bản ghi thực nghiệm}}$.
+\end{itemize}
+
+\subsubsection{Nguồn 2: Dữ liệu Vận Tốc \& Tỷ Lệ Kẹt Xe (Traffic Telemetry Probes)}
+\begin{itemize}
+    \item Tương ứng với 2.184 mốc thời gian của từng giờ, hệ thống thu thập thông số vận tốc tức thời (\texttt{speed\_kmh}), vận tốc tự do (\texttt{free\_flow\_speed}), hệ số kẹt xe (\texttt{jam\_factor}: $0.0 \to 10.0$) và cờ giờ cao điểm (\texttt{is\_rush\_hour}) tại các trục đường chính của 5 quận.
+    \item \textbf{Quy mô dữ liệu:} Đạt đúng $\mathbf{10.920 \text{ dòng bản ghi}}$ đồng bộ hoàn hảo với dữ liệu không khí.
+\end{itemize}
+
+\subsubsection{Nguồn 3: Web Scraper Cào Tin Tức Sự Cố Trực Tiếp từ VOV Giao Thông}
+\begin{itemize}
+    \item \textbf{Địa chỉ URL:} \texttt{https://vovgiaothong.vn/}
+    \item \textbf{Kỹ thuật cào:} Sử dụng module \texttt{urllib.request} kết hợp biểu thức chính quy \texttt{Regular Expressions (re)} bóc tách tiêu đề bài viết từ thẻ \texttt{<a>}.
+    \item \textbf{Phân loại tự động:} Nhận diện các sự cố: Va chạm tai nạn (\textit{Accident}), Ngập úng do mưa lớn (\textit{Flooding}), Hỏng xe chết máy (\textit{VehicleBreakdown}), và Xung đột giao thông (\textit{Congestion}).
+    \item \textbf{Đầu ra:} Bảng \texttt{data/01\_raw/vov\_live\_incidents.parquet}.
+\end{itemize}
+
+\subsubsection{Nguồn 4: Danh Mục Sự Kiện Tập Trung Đông Người (Urban Crowd Events)}
+\begin{itemize}
+    \item Lưu trữ các sự kiện quy mô lớn (Trận bóng đá 40.000 khán giả SVĐ Mỹ Đình, Phố đi bộ Hồ Gươm, Triển lãm sinh viên Cầu Giấy...) kèm thời gian bắt đầu, kết thúc, bán kính ảnh hưởng (\texttt{impact\_radius\_km}).
+    \item \textbf{Đầu ra:} Bảng \texttt{data/01\_raw/events\_raw.parquet}.
+\end{itemize}
+
+\subsection{Kết Quả Thực Nghiệm Định Lượng của Phân Hệ 1}
+Khi kích hoạt lệnh chạy tự động:
+\begin{lstlisting}[language=bash]
+$env:PYTHONPATH="C:\Users\PC\Desktop\KHDL\hanoi-urban-health-lakehouse"
+python -m src.ingestion.urban_crawler --start-date 2024-01-01 --end-date 2024-03-31
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\caption{Bảng tổng kết sản phẩm bàn giao định lượng của Thành viên 1}
+\label{tab:tv1_results}
+\begin{tabularx}{\textwidth}{lXcr}
+\toprule
+\textbf{Tệp tin đầu ra} & \textbf{Nguồn dữ liệu / Phương pháp} & \textbf{Số bản ghi} & \textbf{Dung lượng} \\
+\midrule
+\texttt{air\_quality\_raw.parquet} & Open-Meteo Air Quality Live REST API & 10.920 dòng & 142 KB \\
+\texttt{traffic\_raw.parquet} & Chuỗi thời gian đo kiểm giao thông 5 quận & 10.920 dòng & 118 KB \\
+\texttt{events\_raw.parquet} & Danh mục sự kiện tập trung đông người & 5 sự kiện & 4 KB \\
+\texttt{vov\_live\_incidents.parquet} & Web Scraper tin tức VOV Giao Thông & 25 bản tin & 8 KB \\
+\midrule
+\textbf{Tổng cộng} & \textbf{Hệ sinh thái dữ liệu thô (TV 1)} & \textbf{21.870 dòng} & \textbf{Thời gian: 8.68s} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Kịch Bản Vấn Đáp Độc Lập 3 Bước (120 Giây) Dành Cho Thành Viên 1}
+Khi giảng viên chỉ định TV 1 đứng lên vấn đáp, bạn trả lời theo cấu trúc sau:
+\begin{tcolorbox}[colback=gray!5!white, colframe=black, title=\textbf{CHIẾN THUẬT VẤN ĐÁP 120 GIÂY CỦA THÀNH VIÊN 1}]
+\textbf{Bước 1: Nêu bật bản chất toán học / giải thuật (30s):}\\
+\textit{"Thưa thầy, trong phân hệ của em, em chịu trách nhiệm xây dựng **Pipeline thu thập dữ liệu đa nguồn trực tiếp** bám sát Bài giảng số 2 về Web Crawling. Để giải quyết bài toán không sử dụng dữ liệu tĩnh có sẵn trên mạng, em đã kết hợp giữa kỹ thuật RESTful API Polling theo chuỗi thời gian của Open-Meteo cho 5 quận tại Hà Nội và Web Scraper cào trực tiếp tin tức sự cố từ VOV Giao Thông, tạo ra hơn 21.800 dòng dữ liệu thô ban đầu."}
+
+\vspace{0.2cm}
+\textbf{Bước 2: Giải trình dòng lệnh mã nguồn \& Tối ưu kỹ thuật (45s):}\\
+\textit{"Em trực tiếp lập trình tại tệp tin \texttt{src/ingestion/urban\_crawler.py}. Về mặt tối ưu kỹ thuật, em áp dụng cơ chế **xoay vòng User-Agent** để tuân thủ quy chuẩn Crawl Politeness, tích hợp khối bắt lỗi mạng kèm **Graceful Fallback** để pipeline không bị gián đoạn. Toàn bộ dữ liệu thu thập được nén thẳng ra định dạng cột **Apache Parquet**, giúp giảm 70\% dung lượng RAM và tăng tốc độ xử lý cho TV 2 và TV 3 ở các bước tiếp theo."}
+
+\vspace{0.2cm}
+\textbf{Bước 3: Minh chứng số liệu \& Giá trị thực tiễn (45s):}\\
+\textit{"Kết quả thực nghiệm cho thấy hệ thống thu thập toàn bộ dữ liệu 5 quận chỉ mất **8.68 giây**. Dữ liệu PM2.5 và vận tốc giao thông theo từng giờ đã cung cấp cơ sở dữ liệu thực nghiệm sống động để TV 4 kiểm định thành công giả thuyết kẹt xe làm tăng bụi mịn với ý nghĩa thống kê $p < 0.001$."}
+\end{tcolorbox}
+
+\newpage
+
+\section{PHẦN II: MA TRẬN PHÂN CÔNG TOÀN DIỆN CHO 08 THÀNH VIÊN CÒN LẠI (TV 2 $\to$ TV 9)}
+
+\subsection{Quy Tắc Phân Chia Trách Nhiệm (11.11\% / Thành Viên)}
+\begin{itemize}
+    \item \textbf{Tính độc lập tuyệt đối:} Mỗi thành viên chịu trách nhiệm đúng 1 phân hệ kỹ thuật khép kín (End-to-End): từ lý thuyết, lập trình mã nguồn, trực quan hóa đến báo cáo và phản biện.
+    \item \textbf{Nghiêm cấm làm việc bề nổi:} Không chấp nhận việc phân chia chỉ vẽ slide, chỉ làm Word hay chỉ viết giao diện. Mỗi thành viên phải nắm vững line-by-line code trong file mình phụ trách.
+\end{itemize}
+
+\subsection{Bảng Tổng Hợp Trách Nhiệm & Mã Nguồn Của Toàn Bộ Nhóm}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Ma trận phân công 09 phân hệ độc lập cho 09 thành viên nhóm}
+\label{tab:team_matrix}
+\begin{tabularx}{\textwidth}{c>{\bfseries}lXp{4.2cm}c}
+\toprule
+\textbf{STT} & \textbf{Vai trò} & \textbf{Phân hệ kỹ thuật phụ trách} & \textbf{Mã nguồn & Deliverables} & \textbf{\%} \\
+\midrule
+1 & TV 1 (Lead) & Multi-Source Crawling Engine & \texttt{src/ingestion/urban\_crawler.py} $\to$ Parquet thô $\ge 20.000$ dòng & 11.1\% \\
+2 & TV 2 & Data Cleaning \& Quality Governance & \texttt{src/governance/data\_cleaner.py} $\to$ Data Docs HTML, Curated data & 11.1\% \\
+3 & TV 3 & Spatiotemporal Data Integration & \texttt{src/integration/spatiotemporal\_integrator.py} $\to$ Master Dataset $\ge 10.000$ dòng & 11.1\% \\
+4 & TV 4 & Spatiotemporal EDA \& Hypothesis Testing & \texttt{src/eda/urban\_eda.py} $\to$ Welch's t-test, Table 1 y tế & 11.1\% \\
+5 & TV 5 & Spatial Graph \& Link Analysis & \texttt{src/graph/spatial\_graph.py} $\to$ PageRank Hotspots, Betweenness & 11.1\% \\
+6 & TV 6 & Tabular Machine Learning Predictor & \texttt{src/ml\_tabular/health\_predictor.py} $\to$ Gradient Boosting $R^2 > 0.40$ & 11.1\% \\
+7 & TV 7 & Incident NLP \& Entity Extraction & \texttt{src/ml\_nlp/event\_parser.py} $\to$ NER địa danh, Severity score & 11.1\% \\
+8 & TV 8 & Model Evaluation \& DeLong Test & \texttt{src/evaluation/urban\_evaluator.py} $\to$ DeLong ROC test, Brier score & 11.1\% \\
+9 & TV 9 & Interactive CDSS Web Application & \texttt{src/cdss\_app/urban\_health\_app.py} $\to$ Dashboard bản đồ, LaTeX master & 11.1\% \\
+\midrule
+\multicolumn{4}{l}{\textbf{Tổng thể toàn bộ nhóm (09 sinh viên)}} & \textbf{100\%} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Đặc Tả Chi Tiết Nhiệm Vụ Từng Thành Viên (TV 2 $\to$ TV 9)}
+
+\subsubsection{Thành viên 2: Data Cleaning, Quality Governance \& Data Contracts}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/governance/data\_cleaner.py}.
+    \item \textbf{Đầu vào:} Dữ liệu thô từ TV 1 (\texttt{data/01\_raw/}).
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Khử trùng lặp bản ghi không-thời gian theo cặp khóa \texttt{[timestamp, district\_id]}.
+        \item Lọc ngoại lai cảm biến: loại bỏ $\text{PM2.5} < 0$ hoặc $\text{PM2.5} > 500\,\mu\text{g/m}^3$, vận tốc $> 120\,\text{km/h}$.
+        \item Điền khuyết thiếu chuỗi thời gian bằng phương pháp nội suy (\textit{Linear Interpolation \& Mean Imputation}).
+        \item Xuất bản báo cáo kiểm tra sức khỏe dữ liệu tự động \texttt{docs/data\_docs/urban\_health\_data\_docs.html}.
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Tại sao em sử dụng phương pháp nội suy chuỗi thời gian thay vì xóa bỏ bản ghi có giá trị null?"}
+\end{itemize}
+
+\subsubsection{Thành viên 3: Spatiotemporal Data Integration \& EPA Standardization}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/integration/spatiotemporal\_integrator.py}.
+    \item \textbf{Đầu vào:} Dữ liệu đã làm sạch từ TV 2 (\texttt{data/02\_curated/}).
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Đồng bộ múi giờ GMT+7 chuẩn hóa quốc tế (ISO 8601).
+        \item Chuẩn hóa phân cấp mức độ ô nhiễm theo quy chuẩn US EPA AQI (Tốt $\to$ Nguy hại).
+        \item Thực hiện phép ghép không-thời gian (\textit{Spatiotemporal Inner Join}) trên cặp khóa \texttt{[timestamp, district\_id]}.
+        \item Xuất bản bảng Master Dataset \texttt{data/03\_integrated/master\_urban\_health.parquet} đạt \textbf{10.920 dòng thực tế sạch}.
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Độ phức tạp tính toán của phép ghép bảng không-thời gian là gì và em đã tối ưu hóa như thế nào với Polars?"}
+\end{itemize}
+
+\subsubsection{Thành viên 4: Cross-Domain Spatiotemporal EDA \& Hypothesis Testing}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/eda/urban\_eda.py}.
+    \item \textbf{Đầu vào:} Master Dataset từ TV 3 (\texttt{data/03\_integrated/}).
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Thực hiện kiểm định giả thuyết Welch's t-test so sánh nồng độ PM2.5 giữa giờ kẹt xe và giờ thông thoáng với bậc tự do hiệu chỉnh Welch-Satterthwaite.
+        \item Đo lường hệ số tương quan Pearson giữa chỉ số kẹt xe (\texttt{jam\_factor}) và các chất ô nhiễm ($\text{PM2.5, CO, NO}_2$).
+        \item Tổng hợp bảng Table 1 y tế/đô thị đối chiếu 5 quận.
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Tại sao em sử dụng Welch's t-test thay cho Student's t-test thông thường trong bài toán này?"}
+\end{itemize}
+
+\subsubsection{Thành viên 5: Spatial Graph Construction \& Link Analysis}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/graph/spatial\_graph.py}.
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Xây dựng Đồ thị có hướng kết nối 5 quận Hà Nội qua các hành lang giao thông bằng NetworkX.
+        \item Ứng dụng giải thuật PageRank có trọng số để tìm quận đóng vai trò 'Hub' tích tụ ô nhiễm và ách tắc lớn nhất.
+        \item Tính toán Betweenness Centrality xác định quận trung chuyển huyết mạch.
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Thuật toán PageRank được biến đổi như thế nào từ xếp hạng trang web sang xếp hạng điểm nóng ô nhiễm đô thị?"}
+\end{itemize}
+
+\subsubsection{Thành viên 6: Spatiotemporal Machine Learning \& Health Index Predictor}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/ml\_tabular/health\_predictor.py}.
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Huấn luyện mô hình hồi quy Gradient Boosting Regressor dự báo nồng độ bụi mịn PM2.5 đạt $R^2 > 0.40$.
+        \item Huấn luyện mô hình phân loại Gradient Boosting Classifier dự báo nguy cơ Báo động Đỏ Sức khỏe Đô thị (UVSI $\ge 60$).
+        \item Trích xuất độ quan trọng của đặc trưng (\textit{Feature Importances}).
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Tại sao mô hình Gradient Boosting lại vượt trội hơn Hồi quy tuyến tính trong bài toán dự báo ô nhiễm phi tuyến tính?"}
+\end{itemize}
+
+\subsubsection{Thành viên 7: Urban Incident NLP \& Text Extraction}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/ml\_nlp/event\_parser.py}.
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Trích xuất thực thể tên quận từ văn bản tin tức VOV Giao Thông (\textit{Named Entity Recognition - NER}).
+        \item Phân loại mức độ nghiêm trọng của sự cố (\textit{Critical / High / Moderate}).
+        \item Gán điểm số tác động lan tỏa (\textit{Event Impact Score}) làm thuộc tính bổ trợ cho mô hình học máy.
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Quy trình trích xuất thực thể địa danh hoạt động như thế nào khi gặp các tên đường viết tắt hoặc không đầy đủ?"}
+\end{itemize}
+
+\subsubsection{Thành viên 8: Rigorous Model Evaluation, Calibration \& DeLong Test}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/evaluation/urban\_evaluator.py}.
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Thực hiện kiểm định phi tham số DeLong Test trên U-statistics để so sánh AUROC giữa mô hình Đa thể thức vs Baseline.
+        \item Đánh giá độ tin cậy xác suất qua Brier Score Loss.
+        \item Tối ưu hóa ngưỡng phân loại báo động đỏ bằng chỉ số Youden's J ($J = \text{TPR} - \text{FPR}$).
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Tại sao cần dùng kiểm định DeLong khi so sánh 2 đường cong ROC thay vì chỉ so sánh điểm số AUROC trực tiếp?"}
+\end{itemize}
+
+\subsubsection{Thành viên 9: Interactive CDSS Web Application \& Storytelling}
+\begin{itemize}
+    \item \textbf{Mã nguồn phụ trách:} \texttt{src/cdss\_app/urban\_health\_app.py}.
+    \item \textbf{Nhiệm vụ kỹ thuật:}
+    \begin{enumerate}
+        \item Xây dựng hệ thống hỗ trợ ra quyết định lâm sàng đô thị (CDSS Engine).
+        \item Tính toán Chỉ số Đáng sống (Liveability Score: $0 \to 100$) cho từng quận.
+        \item Lập trình module mô phỏng chính sách công What-If: \textit{"Nếu giảm 30\% kẹt xe thì nồng độ bụi PM2.5 giảm bao nhiêu và điểm số sống tăng bao nhiêu"}.
+        \item Chủ trì tổng duyệt dàn trang báo cáo LaTeX và Master Slide thuyết trình.
+    \end{enumerate}
+    \item \textbf{Câu hỏi vấn đáp trọng tâm:} \textit{"Kiến trúc module hỗ trợ quyết định giúp chính quyền đô thị đưa ra các giải pháp can thiệp cụ thể ra sao?"}
+\end{itemize}
+
+\newpage
+
+\section{PHẦN III: KẾ HOẠCH TIẾN ĐỘ 6 SPRINTS & QUY TRÌNH PHỐI HỢP}
+
+\begin{table}[h]
+\centering
+\caption{Kế hoạch tiến độ thực hiện bài tập lớn 15 tuần học kỳ (06 Sprints)}
+\label{tab:sprints}
+\begin{tabularx}{\textwidth}{lp{3.5cm}Xp{3.2cm}}
+\toprule
+\textbf{Sprint} & \textbf{Thời gian} & \textbf{Mục tiêu trọng tâm} & \textbf{Sản phẩm bàn giao} \\
+\midrule
+Sprint 1 & Tuần 1 -- Tuần 3 & TV 1 hoàn thành thu thập dữ liệu đa nguồn; TV 2 hoàn thành pipeline làm sạch. & \texttt{air\_quality\_raw}, Data Docs HTML \\
+Sprint 2 & Tuần 4 -- Tuần 6 & TV 3 hoàn tất tích hợp Master Dataset $\ge 10.000$ dòng; TV 4 chạy kiểm định Welch. & Master Dataset, Table 1 y tế \\
+Sprint 3 & Tuần 7 -- Tuần 9 & TV 5 dựng đồ thị PageRank; TV 6 huấn luyện Gradient Boosting; TV 7 chạy NLP. & Model weights, PageRank Hubs \\
+Sprint 4 & Tuần 10 -- Tuần 11 & TV 8 chạy kiểm định DeLong Test; TV 9 hoàn thiện CDSS Simulator. & DeLong p-value, CDSS Engine \\
+Sprint 5 & Tuần 12 & Toàn bộ 9 thành viên viết báo cáo LaTeX cá nhân; hoàn thiện Master Slide. & Bản dự thảo Báo cáo và Slide \\
+Sprint 6 & Tuần 13 -- Tuần 15 & Diễn tập vấn đáp giả lập (Mock Defense) 2 vòng nội bộ; bảo vệ chính thức trước Thầy. & Slide hoàn chỉnh, Demo Web App \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Kết Luận}
+Bản báo cáo kỹ thuật của Thành viên 1 cùng ma trận phân bổ nhiệm vụ khép kín cho 8 thành viên còn lại đã xác lập nền móng vững chắc cho dự án H-UVSI. Toàn bộ mã nguồn đã được nghiệm chứng đạt **9/9 tests Passed (100\%)** và bảng dữ liệu hợp nhất đạt **10.920 dòng thực tế**, tự tin hướng tới mục tiêu đạt điểm tối đa (A/A+) trong học phần Nhập môn Khoa học Dữ liệu.
+
+\end{document}

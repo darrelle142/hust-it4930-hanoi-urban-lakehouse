@@ -1,0 +1,34 @@
+# Cấu hình Thu thập Dữ liệu Đa Nguồn (TV 1)
+urban_health_crawler:
+  city: "Hanoi"
+  timezone: "Asia/Bangkok"
+  districts:
+    - district_id: "HN_HK"
+      name: "Hoan Kiem"
+      latitude: 21.0285
+      longitude: 105.8542
+    - district_id: "HN_CG"
+      name: "Cau Giay"
+      latitude: 21.0365
+      longitude: 105.7935
+    - district_id: "HN_DD"
+      name: "Dong Da"
+      latitude: 21.0180
+      longitude: 105.8250
+    - district_id: "HN_HD"
+      name: "Ha Dong"
+      latitude: 20.9720
+      longitude: 105.7750
+    - district_id: "HN_NTL"
+      name: "Nam Tu Liem"
+      latitude: 21.0120
+      longitude: 105.7650
+
+  air_quality_api:
+    base_url: "https://air-quality-api.open-meteo.com/v1/air-quality"
+    start_date: "2024-01-01"
+    end_date: "2024-09-30" # 9 tháng = ~6552 giờ mỗi quận
+    metrics: ["pm10", "pm2_5", "carbon_monoxide", "nitrogen_dioxide", "european_aqi", "us_aqi"]
+
+  output_dir: "data/01_raw"
+  format: "parquet"

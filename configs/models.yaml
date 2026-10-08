@@ -1,0 +1,26 @@
+# Cấu hình Mô hình Học máy & Đồ thị Sức khỏe Đô thị (TV 6 & TV 7)
+tabular_model:
+  target: "pm2_5"
+  type: "gradient_boosting_regressor"
+  params:
+    n_estimators: 150
+    learning_rate: 0.05
+    max_depth: 5
+    random_state: 42
+  features:
+    - "jam_factor"
+    - "speed_kmh"
+    - "is_rush_hour"
+    - "carbon_monoxide"
+    - "nitrogen_dioxide"
+    - "has_crowd_event"
+    - "spatial_pagerank"
+
+graph_model:
+  directed: true
+  damping_factor: 0.85
+  nodes: ["HN_HK", "HN_CG", "HN_DD", "HN_HD", "HN_NTL"]
+
+evaluation:
+  test_size: 0.2
+  delong_alpha: 0.05
